@@ -1,56 +1,42 @@
-/* greetings.c
-Compile and run:
-
-mpicc greetings.c -o greetings.x
-mpirun -np 4 ./greetings.x
-
-*/
 #include "stdio.h"
-#include "string.h"
 #include "mpi.h"
+#define N 16
 
-int main(int argc, char* argv[])
-{
-  int         my_rank;       /* rank of process      */
-  int         p;             /* number of processes  */
-  int         source;        /* rank of sender       */
-  int         dest;          /* rank of receiver     */
-  int         tag = 0;       /* tag for messages     */
-  char        message[100];  /* storage for message  */
-  MPI_Status  status;        /* status for receive   */
-  
-  /* Start up MPI */
-  MPI_Init(&argc, &argv);
-  
-  /* Find out process rank  */
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  
-  /* Find out number of processes */
-  MPI_Comm_size(MPI_COMM_WORLD, &p);
+int main(int argc, char* argv[]) {
+    int p;
+    int my_rank;
+    float A[N][N];
+    float T[N][N];
+    MPI_Status status;
+    MPI_Datatype column_mpi_t;
+    int i, j;
 
-  if (my_rank != 0) 
-    {
-      /* Create message */
-      sprintf(message, "Greetings from process %d!",
-	      my_rank);
-      dest = 0;
-      /* Use strlen+1 so that '\0' gets transmitted */
-      MPI_Send(message, strlen(message)+1, MPI_CHAR, 
-      	       dest, tag, MPI_COMM_WORLD);
-    } 
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
-  else 
-    { /* my_rank == 0 */
-      for (source = 1; source < p; source++) 
-	{
-	  MPI_Recv(message, 100, MPI_CHAR, source, tag, 
-		   MPI_COMM_WORLD, &status);
-	  printf("%s\n", message);
+    MPI_Type_vector(2, 2, N, MPI_FLOAT, &column_mpi_t);
+    MPI_Type_commit(&column_mpi_t);
+
+    if (my_rank == 0) {
+        for (i = 0; i < N; i++)
+            for (j = 0; j < N; j++)
+                A[i][j] = (float) j;
+        MPI_Send(&(A[0][2]), 1, column_mpi_t, 1, 0,MPI_COMM_WORLD);
+    } else { 
+        for (i = 0; i < N; i++)
+            for (j = 0; j < N; j++)
+                T[i][j] = 0.0;
+
+        MPI_Recv(&(T[0][2]), 1, column_mpi_t, 0, 0,MPI_COMM_WORLD, &status);
+        for (i = 0; i < N; i++) {
+            for (j = 0; j < N; j++)
+                printf("%4.1f ", T[i][j]);
+            printf("\n");
         }
+        printf("\n");
     }
-  
-  /* Shut down MPI */
-  MPI_Finalize();
 
-  return 0;
-} 
+    MPI_Finalize();
+    return 0 ; 
+}  /* main */
+	
