@@ -31,14 +31,16 @@ int main(int argc, char* argv[]) {
 
     if (my_rank == 0) {
 
-      for (i = 0; i < N+2; i++){
-        for (j = 0; j < N+2; j++){
-          // The edge value init to 8
-          if(i == 0 || j == 0 || i == N+1 || j == N+1){
-            A[i][j] = 8;
-          }else{
-            A[i][j] =  A[i][j] =  rand() % 2;;
-          }   
+      for (i = 1; i < N+1; i++){
+        for (j = 1; j < N+1; j++){
+          A[i][j] =  A[i][j] =  rand() % 2;
+
+          // assign edge and corner values
+          if(i == 1 && j == 1){
+            A[N+1][N+1] = A[i][j];
+          }
+ 
+             
         }
       }
 
