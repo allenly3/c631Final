@@ -1,3 +1,11 @@
+/*
+    Read Me
+  - Only 0 and 1, so use INT array
+  - 0 stands for dead, 1 stands for alive
+  - N for matrix edge size
+  - We assume that  N is divisible by p ( the number of process)  
+  - p also is a square number
+*/
 #include "stdio.h"
 #include "stdlib.h"
 #include "mpi.h"
@@ -7,9 +15,6 @@
 int main(int argc, char* argv[]) {
     int p;
     int my_rank;
-
-    // Only 0 and 1, so use INT array
-    // 0 stands for dead, 1 stands for alive
 
     // To be periodic
     /*
@@ -27,7 +32,6 @@ int main(int argc, char* argv[]) {
     MPI_Datatype column_mpi_t;
     int i, j, counter;
     counter = 10;
-
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
