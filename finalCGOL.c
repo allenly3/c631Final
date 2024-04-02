@@ -2,16 +2,24 @@
 #include "stdlib.h"
 #include "mpi.h"
 #include "time.h"
-#define N 4
+#define N 8
 
 int main(int argc, char* argv[]) {
     int p;
     int my_rank;
 
+    // Only 0 and 1, so use INT array
+    // 0 stands for dead, 1 stands for alive
 
-    // Only 0 and 1, so use int
-
-    // To be periodic, originally
+    // To be periodic
+    /*
+      P P P P P P
+      P 1 0 1 0 P
+      P 1 0 1 0 P
+      P 0 1 0 1 P
+      P P P P P P
+    So the array initialized size is N+2
+    */
 
     int A[N+2][N+2];
     int T[N+2][N+2];
@@ -25,8 +33,8 @@ int main(int argc, char* argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
 
-    // 2x2 matrix, distance: N
-    MPI_Type_vector(4, 4, N+1, MPI_INT, &column_mpi_t);
+    // test 4x4 matrix, distance: N+2
+    MPI_Type_vector(4, 4, N+2, MPI_INT, &column_mpi_t);
     MPI_Type_commit(&column_mpi_t);
     srand(time(NULL));
 
