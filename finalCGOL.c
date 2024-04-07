@@ -4,7 +4,6 @@
   - 0 stands for dead, 1 stands for alive
   - N for matrix edge size
   - We assume that  N is divisible by p ( the number of process)  
-  - p also is a square number
 */
 #include "stdio.h"
 #include "stdlib.h"
@@ -13,7 +12,8 @@
 #define N 8
 
 int main(int argc, char* argv[]) {
-  int p;
+
+  int size;
   int my_rank;
 
   // To be periodic
@@ -33,9 +33,14 @@ int main(int argc, char* argv[]) {
   int i, j, counter;
   counter = 10;
 
+  if( N % size != 0 ){
+    printf("Program Ends. Number of Process should be a factor of N(%d) \n", N); 
+    return 0;
+  }
+
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   // test 4x4 matrix, distance: N+2
   MPI_Type_vector(4, 4, N+2, MPI_INT, &column_mpi_t);
