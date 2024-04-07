@@ -31,21 +31,33 @@ int main(int argc, char* argv[]) {
   MPI_Status status;
   MPI_Datatype column_mpi_t;
   int i, j, counter;
+  int G = 1; // Number of Generation we want to see
+  int subSize; 
   counter = 10;
 
-  if( N % size != 0 ){
-    printf("Program Ends. Number of Process should be a factor of N(%d) \n", N); 
-    return 0;
-  }
+
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  // test 4x4 matrix, distance: N+2
-  MPI_Type_vector(4, 4, N+2, MPI_INT, &column_mpi_t);
+  if( N % size != 0 ){
+    printf("Program Ends. Number of Process should be a factor of N(%d), size(%d) \n", N, size); 
+    MPI_Finalize();
+    return 0;
+  }
+
+  // Split Original matrix A according to size P
+  // And create a vector of sending blocks
+
+  subSize = N/size;  // number of element in submatrix
+
+  MPI_Type_vector(subSize, subSize, N+2, MPI_INT, &column_mpi_t);
   MPI_Type_commit(&column_mpi_t);
+
+  
   srand(time(NULL));
+
 
   for (i = 0; i < N+2; i++){
     for (j = 0; j < N+2; j++){ 
@@ -107,6 +119,14 @@ int main(int argc, char* argv[]) {
 
     printf("************ Initialization Done ************\n");      
       //MPI_Send(&(A[0][4]), 1, column_mpi_t, 1, 0,MPI_COMM_WORLD);
+
+
+
+
+    
+
+
+
   
   } else { 
       // for (i = 0; i < N; i++)
