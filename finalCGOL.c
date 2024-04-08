@@ -183,8 +183,8 @@ int main(int argc, char* argv[]) {
 
   for (i = 0; i < N+2; i++){
     for (j = 0; j < N+2; j++){ 
-      A[i][j] = 99;
-      S[i][j] = 99;
+      A[i][j] = 9;
+      S[i][j] = 9;
     }
   }
 
