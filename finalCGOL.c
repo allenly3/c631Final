@@ -12,7 +12,7 @@
 #include "time.h"
 #include "unistd.h"
 
-#define N 8
+#define N 4
 
 void toPeriodic(int arr[N+2][N+2] , int n) {
   int i , j;
@@ -59,6 +59,64 @@ void toPeriodic(int arr[N+2][N+2] , int n) {
     }
 }
 
+
+/*
+0: dead
+1: live
+Four Rules:
+Any live cell with fewer than two live neighbors dies, as if by underpopulation.
+Any live cell with two or three live neighbors lives on to the next generation.
+Any live cell with more than three live neighbors dies, as if by overpopulation.
+Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+*/
+void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN) {
+
+    int i , j;
+    int liveCounter = 0;
+
+    for (i = 1; i < subN+1; i++){
+      for (j = 1; j < subN+1; j++){
+
+        liveCounter =   arr[i-1][j-1] + arr[i-1][j] + arr[i-1][j+1] + 
+                        arr[i][j-1] + arr[i][j+1] + 
+                        arr[i+1][j-1] + arr[i+1][j] + arr[i+1][j+1];
+
+        //printf("%d", liveCounter);
+
+        storeArr[i][j] = arr[i][j];
+        if(arr[i][j] == 1){ // This dot is alive
+
+            if(liveCounter < 2){
+              storeArr[i][j] = 0 ;
+            } else if (liveCounter == 2 || liveCounter ==3){
+              storeArr[i][j] = 1 ;
+            } else if ( liveCounter > 3){
+              storeArr[i][j] = 0 ;
+            }
+
+        
+        }else if(arr[i][j] == 0){ // This dot is dead
+
+          if ( liveCounter == 3){
+            storeArr[i][j] = 1;
+          }
+
+        }
+        //printf(":%d  ", storeArr[i][j]);
+      }
+      printf("\n");
+    }
+
+    for (i = 0; i < subN+2; i++) {
+      for (j = 0; j < subN+2; j++){
+        printf("%d ", storeArr[i][j]);
+      }
+      printf("\n");
+    }
+  
+
+
+}
 
 int main(int argc, char* argv[]) {
 
@@ -116,6 +174,7 @@ int main(int argc, char* argv[]) {
   for (i = 0; i < N+2; i++){
     for (j = 0; j < N+2; j++){ 
       A[i][j] = 99;
+      S[i][j] = 99;
     }
   }
 
@@ -124,9 +183,13 @@ int main(int argc, char* argv[]) {
     // Initialize matrix in P0
     for (i = 1; i < N+1; i++){
       for (j = 1; j < N+1; j++){
-        //A[i][j] =   rand() % 2;
-        A[i][j] =  A[i][j] =  counter;
-        counter++;
+
+        // for init random value 1 or 0
+        A[i][j] =   rand() % 2;
+
+        //for Testing
+        // A[i][j] =  A[i][j] =  counter;
+        // counter++;
  
       }
     }
@@ -147,6 +210,14 @@ int main(int argc, char* argv[]) {
     for (i = 0 ; i < size ; i ++){
       for(j = 0; j < size; j ++){
           if(j == 0 ){
+
+            statusUpdate(A,S,subSize);
+
+
+
+
+
+
             continue; //  Skip p0 
           }
           MPI_Send(&(A[i*subSize][j*subSize]), 1, column_mpi_t, j, 0, MPI_COMM_WORLD);
@@ -166,13 +237,14 @@ int main(int argc, char* argv[]) {
       
       for( k =0; k < size; k++){
         MPI_Recv(&(T[0][0]), 1, column_mpi_t, 0, 0,MPI_COMM_WORLD, &status);
+
         usleep(100000);
-        for (i = 0; i < subSize+2; i++) {
-          for (j = 0; j < subSize+2; j++){
-            printf("%d ", T[i][j]);
-          }
-          printf("\n");
-        }
+        // for (i = 0; i < subSize+2; i++) {
+        //   for (j = 0; j < subSize+2; j++){
+        //     printf("%d ", T[i][j]);
+        //   }
+        //   printf("\n");
+        // }
         printf("\n");
       }
       
