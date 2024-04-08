@@ -14,6 +14,52 @@
 
 #define N 8
 
+void toPeriodic(int arr[N+2][N+2] , int n) {
+  int i , j;
+
+    for (i = 1; i < n+1; i++){
+      for (j = 1; j < n+1; j++){
+ 
+
+        // assign edge and corner values
+        if(i == 1){
+          //First row value to 
+          if(j == 1){
+            arr[n+1][n+1] = arr[i][j];
+          }
+          if(j == n){
+            arr[n+1][0] = arr[i][j];
+          }
+          arr[n+1][j] =  arr[i][j];
+          
+        }
+
+        if( i == n ){
+
+          if(j == 1){
+            arr[0][n+1] = arr[i][j];
+          }
+          if(j == n){
+            arr[0][0] = arr[i][j];
+          }
+          arr[0][j] =  arr[i][j];
+
+        }
+
+        if(j == 1){
+          arr[i][n+1] = arr[i][j];
+        }
+
+        if(j == n){
+          arr[i][0] = arr[i][j];
+        }
+
+            
+      }
+    }
+}
+
+
 int main(int argc, char* argv[]) {
 
   int size;
@@ -75,48 +121,17 @@ int main(int argc, char* argv[]) {
 
   if (my_rank == 0) {
 
+    // Initialize matrix in P0
     for (i = 1; i < N+1; i++){
       for (j = 1; j < N+1; j++){
-        //A[i][j] =  A[i][j] =  rand() % 2;
+        //A[i][j] =   rand() % 2;
         A[i][j] =  A[i][j] =  counter;
         counter++;
-
-        // assign edge and corner values
-        if(i == 1){
-          //First row value to 
-          if(j == 1){
-            A[N+1][N+1] = A[i][j];
-          }
-          if(j == N){
-            A[N+1][0] = A[i][j];
-          }
-          A[N+1][j] =  A[i][j];
-          
-        }
-
-        if( i == N ){
-
-          if(j == 1){
-            A[0][N+1] = A[i][j];
-          }
-          if(j == N){
-            A[0][0] = A[i][j];
-          }
-          A[0][j] =  A[i][j];
-
-        }
-
-        if(j == 1){
-          A[i][N+1] = A[i][j];
-        }
-
-        if(j == N){
-          A[i][0] = A[i][j];
-        }
-
-            
+ 
       }
     }
+
+    toPeriodic(A,N); 
 
     for (i = 0; i < N+2; i++){
       for (j = 0; j < N+2; j++){
