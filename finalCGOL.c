@@ -11,6 +11,8 @@
 #include "mpi.h"
 #include "time.h"
 #include "unistd.h"
+#include "stdbool.h"
+
 
 #define N 4
 
@@ -69,19 +71,26 @@ Any live cell with two or three live neighbors lives on to the next generation.
 Any live cell with more than three live neighbors dies, as if by overpopulation.
 Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
 */
-void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN) {
+void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN, bool p0) {
 
     int i , j;
     int liveCounter = 0;
+    int row ;
 
-    for (i = 1; i < subN+1; i++){
+    if(p0){
+      row = N + 1;
+    }else{
+      row = subN + 1;
+    }
+
+    for (i = 1; i < row; i++){
       for (j = 1; j < subN+1; j++){
 
         liveCounter =   arr[i-1][j-1] + arr[i-1][j] + arr[i-1][j+1] + 
                         arr[i][j-1] + arr[i][j+1] + 
                         arr[i+1][j-1] + arr[i+1][j] + arr[i+1][j+1];
 
-        //printf("%d", liveCounter);
+        printf("%d", liveCounter);
 
         storeArr[i][j] = arr[i][j];
         if(arr[i][j] == 1){ // This dot is alive
@@ -102,18 +111,19 @@ void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN) {
           }
 
         }
-        //printf(":%d  ", storeArr[i][j]);
+        printf(":%d  ", storeArr[i][j]);
       }
       printf("\n");
     }
 
-    for (i = 0; i < subN+2; i++) {
+  
+    for (i = 0; i < row + 1; i++) {
       for (j = 0; j < subN+2; j++){
         printf("%d ", storeArr[i][j]);
       }
       printf("\n");
     }
-  
+
 
 
 }
@@ -205,18 +215,16 @@ int main(int argc, char* argv[]) {
 
     printf("************ Initialization Done ************\n");      
    
-    // Sending submatrix
+  
 
+    //  Update live and dead status
+
+    statusUpdate(A,S,subSize, true);   // Update p0 directly
+
+     // Sending submatrix
     for (i = 0 ; i < size ; i ++){
       for(j = 0; j < size; j ++){
           if(j == 0 ){
-
-            statusUpdate(A,S,subSize);
-
-
-
-
-
 
             continue; //  Skip p0 
           }
@@ -225,10 +233,6 @@ int main(int argc, char* argv[]) {
       }
     }
 
-
-
-
-  
   
   } else { 
       for (i = 0; i < N+2; i++)
