@@ -154,6 +154,7 @@ int main(int argc, char* argv[]) {
   MPI_Datatype column_mpi_t, column_mpi_origin;
   int i, j, k, q, counter, row , col;
   int G = 1; // Number of Generation we want to see
+  int req_size; // non-block req counter
   int subSize; 
   counter = 10;
 
@@ -164,7 +165,8 @@ int main(int argc, char* argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  MPI_Request reqs[size];
+  //for sending back by non-blocking communication
+  MPI_Request *reqs = (MPI_Request *)malloc(size * sizeof(MPI_Request)); 
 
   if( N % size != 0 ){
     printf("Program Ends. Number of Process should be a factor of N(%d), size(%d) \n", N, size); 
@@ -180,10 +182,12 @@ int main(int argc, char* argv[]) {
 
   subSize = N/size;  // number of element in submatrix
 
+  //square submatrix
   MPI_Type_vector(subSize+2, subSize+2, N+2, MPI_INT, &column_mpi_t);
   MPI_Type_commit(&column_mpi_t);
 
-  MPI_Type_vector(subSize, subSize, N+2, MPI_INT, &column_mpi_origin);
+  //send back to P0 
+  MPI_Type_vector(N+2, subSize, N+2, MPI_INT, &column_mpi_origin);
   MPI_Type_commit(&column_mpi_origin);
 
   
@@ -197,7 +201,8 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  if (my_rank == 0) {
+// ----------------------------------P0-------------------------
+  if (my_rank == 0) { 
 
     // Initialize matrix in P0
     for (i = 1; i < N+1; i++){
@@ -242,14 +247,29 @@ int main(int argc, char* argv[]) {
       }
     }
 
+    req_size = 0 ;
+    for (i = 0 ; i < size; i++){
 
-    // for (i = 0 ; i < size; i++){
+        if(i == 0){   //  P0 already update status itself
+          continue;
+        }
 
-    //     MPI_Irecv(&S[1][], 1, column_mpi_origin, i, 1, MPI_COMM_WORLD, &reqs[0]);
-    //     MPI_Waitall(size, reqs, MPI_STATUSES_IGNORE);
-    // }
+        MPI_Irecv(&S[0][i*subSize+1], 1, column_mpi_origin, i, 2, MPI_COMM_WORLD, &reqs[req_size++]);
+        
+    }
+    MPI_Waitall(req_size, reqs, MPI_STATUSES_IGNORE);
+
+    //After recieve from other processes, check S 
+    for (i = 0; i < N+2; i++) {
+      for (j = 0; j < N+2; j++){
+        printf("%d ", S[i][j]);
+      }
+      printf("\n");
+    }
+  
 
   
+  // ----------------------------------Other Processes-------------------------
   } else { 
       for (i = 0; i < N+2; i++){
         for (j = 0; j < N+2; j++){
@@ -291,7 +311,9 @@ int main(int argc, char* argv[]) {
         printf("\n");
       }
 
-      // Check U_T
+      
+      printf("P%d is sending: \n", my_rank);
+      // Check S_U
       for (i = 0; i < N+2; i++) {
         for (j = 0; j < subSize+2; j++){
 
@@ -303,9 +325,9 @@ int main(int argc, char* argv[]) {
 
       //send submatrix back to P0's  S
 
-      
-      
-      
+      req_size = 0;
+      MPI_Isend(&S_U[0][1], 1, column_mpi_origin, 0, 2, MPI_COMM_WORLD, &reqs[req_size++]);
+      MPI_Waitall(req_size, reqs, MPI_STATUSES_IGNORE);
   }
 
   MPI_Finalize();
