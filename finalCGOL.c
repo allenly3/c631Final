@@ -153,7 +153,7 @@ int main(int argc, char* argv[]) {
   MPI_Status status;
   MPI_Datatype column_mpi_t, column_mpi_origin;
   int i, j, k, q, counter, row , col;
-  int G = 1; // Number of Generation we want to see
+  int Generation = 1; // Number of Generation we want to see
   int req_size; // non-block req counter
   int subSize; 
   counter = 10;
@@ -227,13 +227,13 @@ int main(int argc, char* argv[]) {
       printf("\n");
     }
 
-    printf("************ Initialization Done ************\n");      
+    printf("************ Initialization with Periodic Done ************\n");      
    
   
 
     //  Update live and dead status
 
-    //statusUpdate(A,S,subSize, true);   // Update p0 directly
+    statusUpdate(A,S,subSize, true);   // Update p0 directly
 
      // Sending submatrix
     for (i = 0 ; i < size ; i ++){
@@ -260,13 +260,16 @@ int main(int argc, char* argv[]) {
     MPI_Waitall(req_size, reqs, MPI_STATUSES_IGNORE);
 
     //After recieve from other processes, check S 
-    for (i = 0; i < N+2; i++) {
-      for (j = 0; j < N+2; j++){
+    //The outer layer of the matrix is used for periodicity
+    //so the for loop indices i and j start from 1 and end at N + 1.
+    printf("P0 recieved GEN %d: \n", Generation);
+    for (i = 1; i < N+1; i++) {
+      for (j = 1; j < N+1; j++){
         printf("%d ", S[i][j]);
       }
       printf("\n");
     }
-  
+    printf("\n");
 
   
   // ----------------------------------Other Processes-------------------------
