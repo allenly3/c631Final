@@ -124,6 +124,8 @@ void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN, bool p
       printf("\n");
     }
 
+    //printf("*****************************\n");
+
 
 
 }
@@ -147,8 +149,9 @@ int main(int argc, char* argv[]) {
   int A[N+2][N+2];
   int T[N+2][N+2];
   int S[N+2][N+2];
+  int S_U [N+2][N+2]; // S matrix  updated.
   MPI_Status status;
-  MPI_Datatype column_mpi_t;
+  MPI_Datatype column_mpi_t, column_mpi_origin;
   int i, j, k, q, counter, row , col;
   int G = 1; // Number of Generation we want to see
   int subSize; 
@@ -156,9 +159,12 @@ int main(int argc, char* argv[]) {
 
 
 
+
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  MPI_Request reqs[size];
 
   if( N % size != 0 ){
     printf("Program Ends. Number of Process should be a factor of N(%d), size(%d) \n", N, size); 
@@ -176,6 +182,9 @@ int main(int argc, char* argv[]) {
 
   MPI_Type_vector(subSize+2, subSize+2, N+2, MPI_INT, &column_mpi_t);
   MPI_Type_commit(&column_mpi_t);
+
+  MPI_Type_vector(subSize, subSize, N+2, MPI_INT, &column_mpi_origin);
+  MPI_Type_commit(&column_mpi_origin);
 
   
   srand(time(NULL));
@@ -219,7 +228,7 @@ int main(int argc, char* argv[]) {
 
     //  Update live and dead status
 
-    statusUpdate(A,S,subSize, true);   // Update p0 directly
+    //statusUpdate(A,S,subSize, true);   // Update p0 directly
 
      // Sending submatrix
     for (i = 0 ; i < size ; i ++){
@@ -233,26 +242,70 @@ int main(int argc, char* argv[]) {
       }
     }
 
+
+    // for (i = 0 ; i < size; i++){
+
+    //     MPI_Irecv(&S[1][], 1, column_mpi_origin, i, 1, MPI_COMM_WORLD, &reqs[0]);
+    //     MPI_Waitall(size, reqs, MPI_STATUSES_IGNORE);
+    // }
+
   
   } else { 
-      for (i = 0; i < N+2; i++)
-          for (j = 0; j < N+2; j++)
-              T[i][j] = 0;
+      for (i = 0; i < N+2; i++){
+        for (j = 0; j < N+2; j++){
+          T[i][j] = 0;
+          S_U[i][j] = 0;
+        }
+      }
+          
       
+
       for( k =0; k < size; k++){
         MPI_Recv(&(T[0][0]), 1, column_mpi_t, 0, 0,MPI_COMM_WORLD, &status);
 
-        usleep(100000);
-        // for (i = 0; i < subSize+2; i++) {
-        //   for (j = 0; j < subSize+2; j++){
-        //     printf("%d ", T[i][j]);
-        //   }
-        //   printf("\n");
-        // }
+        usleep(10000 * my_rank);
+        for (i = 0; i < subSize+2; i++) {
+          for (j = 0; j < subSize+2; j++){
+            printf("%d ", T[i][j]);
+          }
+          printf("\n");
+        }
+        printf("\n");
+
+        statusUpdate(T,S,subSize, false);  // sub matrix update
+        
+        // after update status, pass value to S_U without periodic values
+        for (i = 1; i < subSize+1; i++) {
+          for (j = 1; j < subSize+1; j++){
+
+            // need k here, k is the row 
+            printf("%d ", S[i][j]);
+            //printf("[%d][%d],", k*subSize +i,j);
+
+            S_U[k*subSize + i][j] = S[i][j];
+          }
+          printf("\n");
+        }
+
+
         printf("\n");
       }
-      
 
+      // Check U_T
+      for (i = 0; i < N+2; i++) {
+        for (j = 0; j < subSize+2; j++){
+
+          // need k here, k is the row 
+          printf("%d ", S_U[i][j]);
+        }
+        printf("\n");
+      }
+
+      //send submatrix back to P0's  S
+
+      
+      
+      
   }
 
   MPI_Finalize();
