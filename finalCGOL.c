@@ -161,8 +161,11 @@ int main(int argc, char* argv[]) {
   int subSize; 
   counter = 10;
 
-
-
+  
+  // if having user Input of Number of Generation
+  if(argc > 1 ){
+    Generation = atoi(argv[1]);
+  }
 
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
