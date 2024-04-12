@@ -12,6 +12,8 @@
 #include "time.h"
 #include "unistd.h"
 #include "stdbool.h"
+#include "omp.h"
+
 
 
 #define N 4
@@ -19,6 +21,9 @@
 void toPeriodic(int arr[N+2][N+2] , int n) {
   int i , j;
 
+  #pragma omp parallel
+  #pragma omp single
+  {
     for (i = 1; i < n+1; i++){
       for (j = 1; j < n+1; j++){
  
@@ -59,6 +64,7 @@ void toPeriodic(int arr[N+2][N+2] , int n) {
             
       }
     }
+  }
 }
 
 
@@ -85,37 +91,41 @@ void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN, bool p
       row = subN + 1;
     }
 
-    for (i = 1; i < row; i++){
-      for (j = 1; j < subN+1; j++){
+    #pragma omp parallel
+    #pragma omp single
+    {
+      for (i = 1; i < row; i++){
+        for (j = 1; j < subN+1; j++){
 
-        liveCounter =   arr[i-1][j-1] + arr[i-1][j] + arr[i-1][j+1] + 
-                        arr[i][j-1] + arr[i][j+1] + 
-                        arr[i+1][j-1] + arr[i+1][j] + arr[i+1][j+1];
+          liveCounter =   arr[i-1][j-1] + arr[i-1][j] + arr[i-1][j+1] + 
+                          arr[i][j-1] + arr[i][j+1] + 
+                          arr[i+1][j-1] + arr[i+1][j] + arr[i+1][j+1];
 
-        printf("%d", liveCounter);
+          printf("%d", liveCounter);
 
-        storeArr[i][j] = arr[i][j];
-        if(arr[i][j] == 1){ // This dot is alive
+          storeArr[i][j] = arr[i][j];
+          if(arr[i][j] == 1){ // This dot is alive
 
-            if(liveCounter < 2){
-              storeArr[i][j] = 0 ;
-            } else if (liveCounter == 2 || liveCounter ==3){
-              storeArr[i][j] = 1 ;
-            } else if ( liveCounter > 3){
-              storeArr[i][j] = 0 ;
+              if(liveCounter < 2){
+                storeArr[i][j] = 0 ;
+              } else if (liveCounter == 2 || liveCounter ==3){
+                storeArr[i][j] = 1 ;
+              } else if ( liveCounter > 3){
+                storeArr[i][j] = 0 ;
+              }
+
+          
+          }else if(arr[i][j] == 0){ // This dot is dead
+
+            if ( liveCounter == 3){
+              storeArr[i][j] = 1;
             }
 
-        
-        }else if(arr[i][j] == 0){ // This dot is dead
-
-          if ( liveCounter == 3){
-            storeArr[i][j] = 1;
           }
-
+          printf(":%d  ", storeArr[i][j]);
         }
-        printf(":%d  ", storeArr[i][j]);
+        printf("\n");
       }
-      printf("\n");
     }
 
   printf(">>>>>>>>>>>>>>> Update Done <<<<<<<<<<<<<<<\n");
