@@ -261,7 +261,8 @@ int main(int argc, char* argv[]) {
       //After recieve from other processes, check S 
       //The outer layer of the matrix is used for periodicity
       //so the for loop indices i and j start from 1 and end at N + 1.
-      printf("P0 recieved GEN %d: \n", Generation);
+      printf("\n ########## P0 recieved All.  GEN %d Result: ##########\n", Generation);
+
       for (i = 1; i < N+1; i++) {
         for (j = 1; j < N+1; j++){
           printf("%d ", S[i][j]);
