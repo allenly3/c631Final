@@ -4,7 +4,6 @@
   - 0 stands for dead, 1 stands for alive
   - N for matrix edge size
   - We assume that  N is divisible by p 
-  - Ansume that size  = p * p  
 */
 #include "stdio.h"
 #include "stdlib.h"
