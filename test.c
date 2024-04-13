@@ -33,7 +33,9 @@ int main(int argc, char* argv[])
   /* Find out number of processes */
   MPI_Comm_size(MPI_COMM_WORLD, &p);
     
-    
+
+
+int a = b = c = 0;
     printf("arg c:%d\n", argc);
  
     int userInput = atoi(argv[1]);
