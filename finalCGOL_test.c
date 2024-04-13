@@ -78,7 +78,7 @@ Any dead cell with exactly three live neighbors becomes a live cell, as if by re
 */
 void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN, bool p0) {
 
-    printf(">>>>>>>>>>>>>>> Status Updating <<<<<<<<<<<<<<<\n");
+    //printf(">>>>>>>>>>>>>>> Status Updating <<<<<<<<<<<<<<<\n");
 
     int i , j;
     int liveCounter = 0;
@@ -127,7 +127,7 @@ void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN, bool p
       }
     }
 
-  printf(">>>>>>>>>>>>>>> Update Done <<<<<<<<<<<<<<<\n");
+  //printf(">>>>>>>>>>>>>>> Update Done <<<<<<<<<<<<<<<\n");
     for (i = 0; i < row + 1; i++) {
       for (j = 0; j < subN+2; j++){
         //printf("%d ", storeArr[i][j]);
@@ -208,7 +208,7 @@ int main(int argc, char* argv[]) {
   
   srand(time(NULL));
 
-
+  counter = 0 ;
   for (i = 0; i < N+2; i++){
     for (j = 0; j < N+2; j++){ 
       A[i][j] =  rand() % 2;  // random 0 or 1 to A
@@ -217,7 +217,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  printf("Iniit: %d \n", counter);
+  printf("At the beginning, live amount: %d  \n", counter);
   //----------Testing cases:------------
 
   // for (i = 0; i < N+2; i++){
@@ -314,7 +314,7 @@ int main(int argc, char* argv[]) {
         //printf("\n");
       }
 
-      printf("************ Full matrix Periodic Done ************\n\n");      
+      //printf("************ Full matrix Periodic Done ************\n\n");      
     
     
 
@@ -349,7 +349,7 @@ int main(int argc, char* argv[]) {
       //After recieve from other processes, check S 
       //The outer layer of the matrix is used for periodicity
       //so the for loop indices i and j start from 1 and end at N + 1.
-      printf("\n ########## P0 recieved All.  GEN %d Result: ##########\n", (g+1));
+      
       counter = 0 ; 
       for (i = 1; i < N+1; i++) {
         for (j = 1; j < N+1; j++){
@@ -358,7 +358,8 @@ int main(int argc, char* argv[]) {
         }
         //printf("\n");
       }
-      printf("%d\n", counter);
+      printf("\n ##########  GEN %d live amount:%d ##########\n", (g+1), counter);
+     // printf("%d\n", counter);
 
     
     // ----------------------------------Other Processes-------------------------
@@ -412,7 +413,7 @@ int main(int argc, char* argv[]) {
             // need k here, k is the row 
             //printf("%d ", S_U[i][j]);
           }
-          printf("\n");
+          //printf("\n");
         }
 
         //send submatrix back to P0's  S
