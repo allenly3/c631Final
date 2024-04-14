@@ -304,7 +304,7 @@ int main(int argc, char* argv[]) {
         }
       }
 
-
+      printf("\n");
       toPeriodic(A,N); 
 
       for (i = 0; i < N+2; i++){
