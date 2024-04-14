@@ -15,7 +15,7 @@
 
 
 
-#define N 64
+#define N 8
 
 void toPeriodic(int arr[N+2][N+2] , int n) {
   int i , j;
@@ -100,7 +100,7 @@ void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN, bool p
                           arr[i][j-1] + arr[i][j+1] + 
                           arr[i+1][j-1] + arr[i+1][j] + arr[i+1][j+1];
 
-          //printf("%d", liveCounter);
+          printf("%d", liveCounter);
 
           storeArr[i][j] = arr[i][j];
           if(arr[i][j] == 1){ // This dot is alive
@@ -121,20 +121,20 @@ void statusUpdate(int arr[N+2][N+2] , int storeArr[N+2][N+2] ,  int subN, bool p
             }
 
           }
-          //printf(":%d  ", storeArr[i][j]);
+          printf(":%d  ", storeArr[i][j]);
         }
-        //printf("\n");
+        printf("\n");
       }
     }
 
   printf(">>>>>>>>>>>>>>> Update Done <<<<<<<<<<<<<<<\n");
     for (i = 0; i < row + 1; i++) {
       for (j = 0; j < subN+2; j++){
-        //printf("%d ", storeArr[i][j]);
+        printf("%d ", storeArr[i][j]);
       }
-      //printf("\n");
+      printf("\n");
     }
-    //printf("\n");
+    printf("\n");
     //printf("*****************************\n");
 
 
@@ -212,12 +212,12 @@ int main(int argc, char* argv[]) {
   for (i = 0; i < N+2; i++){
     for (j = 0; j < N+2; j++){ 
       A[i][j] =  rand() % 2;  // random 0 or 1 to A
-      if(A[i][j] == 1 ) counter ++;
+      //if(A[i][j] == 1 ) counter ++;
       S[i][j] = 9; // init S using 9, its better to check result 
     }
   }
 
-  printf("Iniit: %d \n", counter);
+  //printf("Init: %d \n", counter);
   //----------Testing cases:------------
 
   // for (i = 0; i < N+2; i++){
@@ -309,9 +309,9 @@ int main(int argc, char* argv[]) {
 
       for (i = 0; i < N+2; i++){
         for (j = 0; j < N+2; j++){
-            //printf("%d ", A[i][j]);
+            printf("%d ", A[i][j]);
         }
-        //printf("\n");
+        printf("\n");
       }
 
       printf("************ Full matrix Periodic Done ************\n\n");      
@@ -350,15 +350,15 @@ int main(int argc, char* argv[]) {
       //The outer layer of the matrix is used for periodicity
       //so the for loop indices i and j start from 1 and end at N + 1.
       printf("\n ########## P0 recieved All.  GEN %d Result: ##########\n", (g+1));
-      counter = 0 ; 
+      //counter = 0 ; 
       for (i = 1; i < N+1; i++) {
         for (j = 1; j < N+1; j++){
-          //printf("%d ", S[i][j]);
-          counter = counter + S[i][j];
+          printf("%d ", S[i][j]);
+          //counter = counter + S[i][j];
         }
-        //printf("\n");
+        printf("\n");
       }
-      printf("%d\n", counter);
+      //printf("%d\n", counter);
 
     
     // ----------------------------------Other Processes-------------------------
@@ -404,13 +404,13 @@ int main(int argc, char* argv[]) {
         }
 
         
-        //printf("P%d is sending: \n", my_rank);
+        printf("P%d is sending: \n", my_rank);
         // Check S_U
         for (i = 0; i < N+2; i++) {
           for (j = 0; j < subSize+2; j++){
 
             // need k here, k is the row 
-            //printf("%d ", S_U[i][j]);
+            printf("%d ", S_U[i][j]);
           }
           printf("\n");
         }
